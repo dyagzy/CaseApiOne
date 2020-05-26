@@ -1,4 +1,5 @@
-﻿using CaseApi.Domain;
+﻿using CaseApi.Data;
+using CaseApi.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,39 +9,47 @@ namespace CaseApi.Service.Implementation
 {
     public class CaseService : ICaseServcie
     {
-        public CaseService()
-        {
+        private readonly ApplicationDbContext _context;
 
+        public CaseService(ApplicationDbContext context)
+        {
+            _context = context;
         }
 
-        public Task CreateAsync(Case kase)
+        public async Task CreateAsync(Case kase)
         {
-            throw new NotImplementedException();
+           await  _context.Cases.AddAsync(kase);
+            await _context.SaveChangesAsync();
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            var kase = GetById(id);
+            _context.Remove(kase);
+           await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<Case> GetAll()
-        {
-            throw new NotImplementedException();
-        }
+        public IEnumerable<Case> GetAll() => _context.Cases.OrderBy(k => k.Title);
+
+
+        public Case GetById(int kaseId) => _context.Cases.FirstOrDefault(k => k.Id == kaseId);
 
         public Case GetById(Case kaseId)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Case kase)
+        public async Task UpdateAsync(Case kase)
         {
-            throw new NotImplementedException();
+            _context.Update(kase);
+           await  _context.SaveChangesAsync();
         }
 
-        public Task UpdateAsync(int id)
+        public async Task UpdateAsync(int id)
         {
-            throw new NotImplementedException();
+            var kase  = GetById(id);
+            _context.Update(kase);
+           await  _context.SaveChangesAsync();
         }
     }
 }

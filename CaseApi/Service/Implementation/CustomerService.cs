@@ -1,4 +1,5 @@
-﻿using CaseApi.Domain;
+﻿using CaseApi.Data;
+using CaseApi.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,39 +9,43 @@ namespace CaseApi.Service.Implementation
 {
     public class CustomerService :ICustomerService
     {
-        public CustomerService()
-        {
+        private readonly ApplicationDbContext _context;
 
+        public CustomerService(ApplicationDbContext context)
+        {
+            _context = context;
         }
 
-        public Task CreateAsync(Customer customer)
+        public async Task CreateAsync(Customer customer)
         {
-            throw new NotImplementedException();
+            await _context.Customers.AddAsync(customer);
+           await _context.SaveChangesAsync();
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            var customer = GetById(id);
+            _context.Remove(customer);
+            await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<Customer> GetAll()
+        public IEnumerable<Customer> GetAll() => _context.Customers.OrderBy(c => c.FirstName);
+
+
+        public Customer GetById(int CustomerId) => _context.Customers.FirstOrDefault(c => c.Id == CustomerId);
+        
+
+        public async Task UpdateAsync(Customer customer)
         {
-            throw new NotImplementedException();
+            _context.Update(customer);
+           await  _context.SaveChangesAsync();
         }
 
-        public Customer GetById(int CustomerId)
+        public async Task UpdateAsync(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(Customer customer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(int id)
-        {
-            throw new NotImplementedException();
+            var customer = GetById(id);
+            _context.Update(customer);
+           await  _context.SaveChangesAsync();
         }
     }
 }
